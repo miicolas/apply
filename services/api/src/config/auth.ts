@@ -4,9 +4,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer } from "better-auth/plugins";
 import { db } from "../db/index.js";
 
-// Default trusted origins including iOS app scheme
 const defaultTrustedOrigins = [
-    "apply://",  // iOS app custom scheme
+    "apply://",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ];
@@ -19,9 +18,6 @@ const trustedOrigins = process.env.BETTER_AUTH_TRUSTED_ORIGINS
       ]
     : defaultTrustedOrigins;
 
-console.log(`🔧 [Auth Config] Initialisation Better Auth`);
-console.log(`🔧 [Auth Config] Base URL: ${baseURL}`);
-console.log(`🔧 [Auth Config] Trusted Origins:`, trustedOrigins);
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
@@ -31,9 +27,8 @@ export const auth = betterAuth({
     baseURL,
     trustedOrigins,
     
-    // Allow requests without Origin header (for native mobile apps)
     advanced: {
-        useSecureCookies: false, // Set to true in production with HTTPS
+        useSecureCookies: false,
         crossSubDomainCookies: {
             enabled: false,
         },
@@ -47,5 +42,3 @@ export const auth = betterAuth({
         bearer(),
     ],
 });
-
-console.log(`✅ [Auth Config] Better Auth initialisé`);
