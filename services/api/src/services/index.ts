@@ -1,0 +1,1 @@
+export { sendOTPEmail } from "./email";

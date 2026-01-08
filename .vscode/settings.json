@@ -3,7 +3,7 @@
     "*.swift": "swift"
   },
   "[swift]": {
-    "editor.defaultFormatter": "sswg.swift-lang",
+    "editor.defaultFormatter": "swiftlang.swift-vscode",
     "editor.formatOnSave": false,
     "editor.semanticHighlighting.enabled": true,
     "editor.tabSize": 4
