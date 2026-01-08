@@ -1,10 +1,10 @@
 import { db } from "../../db/index.js";
-import { opportunity } from "../../db/schema/opportunities/schema.js";
-import { eq, and, desc } from "drizzle-orm";
-import type { CreateOpportunityInput } from "./schema.js";
+import { opportunity, statusEnum } from "../../db/schema/opportunities/schema";
+import { eq, and, desc, InferEnum} from "drizzle-orm";
+import type { CreateOpportunityInput } from "./schema";
 
 export class OpportunityService {
-  async findAll(userId: string, status?: string) {
+  async findAll(userId: string, status?: InferEnum<typeof statusEnum>) {
     const conditions = [eq(opportunity.userId, userId)];
 
     if (status) {
@@ -39,11 +39,11 @@ export class OpportunityService {
     return newOpportunity;
   }
 
-  async updateStatus(userId: string, id: string, status: string) {
+  async updateStatus(userId: string, id: string, status: InferEnum<typeof statusEnum>) {
     const [updated] = await db
       .update(opportunity)
       .set({
-        status,
+        status: status,
         updatedAt: new Date(),
       })
       .where(and(eq(opportunity.id, id), eq(opportunity.userId, userId)))
