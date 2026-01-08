@@ -9,10 +9,7 @@ struct DiscoveryView: View {
                 ZStack {
                     Color(.systemGroupedBackground)
                         .ignoresSafeArea()
-
-                    if opportunitiesVM.isLoading {
-                        ProgressView()
-                    } else if opportunitiesVM.newOpportunities.isEmpty {
+                    if opportunitiesVM.newOpportunities.isEmpty {
                         VStack(spacing: 24) {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.system(size: 60))

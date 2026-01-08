@@ -13,8 +13,8 @@ import Combine
 class OpportunitiesViewModel: ObservableObject {
     @Published var newOpportunities: [Opportunity] = []
     @Published var validatedOpportunities: [Opportunity] = []
+    @Published var appliedOpportunities: [Opportunity] = []
     @Published var ignoredOpportunities: [Opportunity] = []
-    @Published var isLoading = false
     @Published var error: String?
 
     private let apiService = APIService.shared
@@ -31,13 +31,13 @@ class OpportunitiesViewModel: ObservableObject {
     func clearAll() {
         newOpportunities.removeAll()
         validatedOpportunities.removeAll()
+        appliedOpportunities.removeAll()
         ignoredOpportunities.removeAll()
     }
 
     // MARK: - Queries
 
     func fetchOpportunities(status: OpportunityStatus? = nil) async {
-        isLoading = true
         error = nil
 
         do {
@@ -49,20 +49,21 @@ class OpportunitiesViewModel: ObservableObject {
                     newOpportunities = opportunities
                 case .validated:
                     validatedOpportunities = opportunities
+                case .applied:
+                    appliedOpportunities = opportunities
                 case .ignored:
                     ignoredOpportunities = opportunities
                 }
             } else {
                 newOpportunities = opportunities.filter { $0.status == .new }
                 validatedOpportunities = opportunities.filter { $0.status == .validated }
+                appliedOpportunities = opportunities.filter { $0.status == .applied }
                 ignoredOpportunities = opportunities.filter { $0.status == .ignored }
             }
         } catch {
             self.error = error.localizedDescription
             handleAuthError(error)
         }
-
-        isLoading = false
     }
 
     func fetchNewOpportunities() async {
@@ -71,6 +72,10 @@ class OpportunitiesViewModel: ObservableObject {
 
     func fetchValidatedOpportunities() async {
         await fetchOpportunities(status: .validated)
+    }
+
+    func fetchAppliedOpportunities() async {
+        await fetchOpportunities(status: .applied)
     }
 
     // MARK: - Mutations
@@ -83,7 +88,6 @@ class OpportunitiesViewModel: ObservableObject {
         source: String?,
         notes: String?
     ) async -> Bool {
-        isLoading = true
         error = nil
 
         let request = CreateOpportunityRequest(
@@ -100,12 +104,10 @@ class OpportunitiesViewModel: ObservableObject {
         do {
             let newOpportunity = try await apiService.createOpportunity(request)
             validatedOpportunities.insert(newOpportunity, at: 0)
-            isLoading = false
             return true
         } catch {
             self.error = error.localizedDescription
             handleAuthError(error)
-            isLoading = false
             return false
         }
     }
@@ -157,7 +159,23 @@ class OpportunitiesViewModel: ObservableObject {
             try await apiService.deleteOpportunity(id: opportunity.id)
             newOpportunities.removeAll { $0.id == opportunity.id }
             validatedOpportunities.removeAll { $0.id == opportunity.id }
+            appliedOpportunities.removeAll { $0.id == opportunity.id }
             ignoredOpportunities.removeAll { $0.id == opportunity.id }
+        } catch {
+            self.error = error.localizedDescription
+            handleAuthError(error)
+        }
+    }
+
+    func applyOpportunity(_ opportunity: Opportunity) async {
+        do {
+            let updated = try await apiService.updateOpportunityStatus(id: opportunity.id, status: .applied)
+            if opportunity.status == .validated {
+                validatedOpportunities.removeAll { $0.id == opportunity.id }
+            } else if opportunity.status == .ignored {
+                ignoredOpportunities.removeAll { $0.id == opportunity.id }
+            }
+            appliedOpportunities.insert(updated, at: 0)
         } catch {
             self.error = error.localizedDescription
             handleAuthError(error)

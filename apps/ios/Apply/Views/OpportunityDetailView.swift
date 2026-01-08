@@ -2,8 +2,10 @@ import SwiftUI
 
 struct OpportunityDetailView: View {
     let opportunity: Opportunity
+    var onApplied: (() -> Void)?
     @Environment(\.openURL) private var openURL
-
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var opportunitiesVM: OpportunitiesViewModel
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
 
@@ -36,7 +38,7 @@ struct OpportunityDetailView: View {
             }
 
             Button {
-                // plus tard : marquer comme postulé
+                markAsApplied()
             } label: {
                 Label("Marquer comme postulé", systemImage: "paperplane")
                     .frame(maxWidth: .infinity)
@@ -46,5 +48,13 @@ struct OpportunityDetailView: View {
             Spacer()
         }
         .padding()
+    }
+
+    private func markAsApplied() {
+        Task { @MainActor in
+            await opportunitiesVM.applyOpportunity(opportunity)
+            onApplied?()
+            dismiss()
+        }
     }
 }

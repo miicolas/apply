@@ -10,13 +10,12 @@ import SwiftUI
 struct ToApplyView: View {
     @EnvironmentObject var opportunitiesVM: OpportunitiesViewModel
     @State private var showingAddOpportunity = false
+    @State private var navigationPath = NavigationPath()
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             Group {
-                if opportunitiesVM.isLoading {
-                    ProgressView()
-                } else if opportunitiesVM.validatedOpportunities.isEmpty {
+                if opportunitiesVM.validatedOpportunities.isEmpty {
                     ContentUnavailableView(
                         "Aucune opportunité",
                         systemImage: "tray",
@@ -25,11 +24,22 @@ struct ToApplyView: View {
                 } else {
                     List {
                         ForEach(opportunitiesVM.validatedOpportunities) { opportunity in
-                            NavigationLink(destination: OpportunityDetailView(opportunity: opportunity)) {
+                            NavigationLink(value: opportunity) {
                                 OpportunityRowView(opportunity: opportunity)
                             }
                         }
                         .onDelete(perform: deleteOpportunities)
+                    }
+                    .navigationDestination(for: Opportunity.self) { opportunity in
+                        OpportunityDetailView(
+                            opportunity: opportunity,
+                            onApplied: {
+                                Task { @MainActor in
+                                    await opportunitiesVM.fetchValidatedOpportunities()
+                                }
+                                }
+                        )
+                        .environmentObject(opportunitiesVM)
                     }
                 }
             }
@@ -67,7 +77,6 @@ struct ToApplyView: View {
     }
 }
 
-// Simple row view for list
 struct OpportunityRowView: View {
     let opportunity: Opportunity
 

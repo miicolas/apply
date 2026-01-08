@@ -1,7 +1,10 @@
-import { pgTable, text, timestamp, varchar, index } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, varchar, index, pgEnum } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { user } from "../auth/schema";
 
+export const priorityEnum = pgEnum("priority", ["A", "B", "C"]);
+
+export const statusEnum = pgEnum("status", ["new", "validated","applied", "ignored"]);
 export const opportunity = pgTable(
   "opportunity",
   {
@@ -12,8 +15,8 @@ export const opportunity = pgTable(
     company: varchar("company", { length: 255 }).notNull(),
     role: varchar("role", { length: 255 }).notNull(),
     location: varchar("location", { length: 255 }),
-    priority: varchar("priority", { length: 1 }).notNull().default("B"), // A, B, C
-    status: varchar("status", { length: 20 }).notNull().default("new"), // new, validated, ignored
+    priority: priorityEnum("priority").notNull().default("B"),
+    status: statusEnum("status").notNull().default("new"),
     url: text("url"),
     source: varchar("source", { length: 255 }),
     notes: text("notes"),

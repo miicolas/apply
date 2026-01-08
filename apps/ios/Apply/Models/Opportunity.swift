@@ -9,10 +9,11 @@ enum Priority: String, Codable {
 enum OpportunityStatus: String, Codable {
     case new
     case validated
+    case applied
     case ignored
 }
 
-struct Opportunity: Identifiable, Codable {
+struct Opportunity: Identifiable, Codable, Hashable {
     let id: String
     let company: String
     let role: String

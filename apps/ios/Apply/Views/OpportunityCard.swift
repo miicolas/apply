@@ -164,8 +164,8 @@ struct OpportunityCard: View {
                     }
             )
         }.sheet(isPresented: $showDetails) {
-        OpportunityDetailView(opportunity: opportunity)
-    }
+            OpportunityDetailView(opportunity: opportunity, onApplied: nil)
+        }
     }
     
     private var priorityColor: Color {
