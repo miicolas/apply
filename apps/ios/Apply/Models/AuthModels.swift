@@ -52,35 +52,15 @@ struct Session: Codable {
 }
 
 // MARK: - Session Response
-struct SessionResponse: Codable {
+struct AuthSessionResponse: Codable {
     let user: User
     let session: Session
 }
 
-// MARK: - Send OTP Request
-struct SendOTPRequest: Codable {
-    let email: String
-    let type: String
-    
-    enum CodingKeys: String, CodingKey {
-        case email
-        case type
-    }
-}
-
-// MARK: - Sign In OTP Request
-struct SignInOTPRequest: Codable {
-    let email: String
-    let otp: String
-    
-    enum CodingKeys: String, CodingKey {
-        case email
-        case otp
-    }
-}
-
-// MARK: - Auth Session (for internal use)
-struct AuthSession {
+// MARK: - Auth Session (for internal use in app)
+/// Lightweight internal representation of an authenticated session used within the app.
+struct AppAuthSession {
     let user: User
     let session: Session
 }
+

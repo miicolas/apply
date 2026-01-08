@@ -51,15 +51,17 @@ struct OpportunityCard: View {
                             .font(.system(size: 20, weight: .medium))
                             .foregroundColor(.secondary)
                         
-                        HStack(spacing: 6) {
-                            Image(systemName: "location.fill")
-                                .font(.system(size: 14))
-                                .foregroundColor(.secondary)
-                            Text(opportunity.location)
-                                .font(.system(size: 16))
-                                .foregroundColor(.secondary)
+                        if let location = opportunity.location {
+                            HStack(spacing: 6) {
+                                Image(systemName: "location.fill")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.secondary)
+                                Text(location)
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.top, 4)
                         }
-                        .padding(.top, 4)
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 30)

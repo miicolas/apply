@@ -17,6 +17,11 @@ const getCorsOrigin = (): string | string[] | ((origin: string) => boolean) => {
       return true;
     }
 
+    // Allow iOS app custom scheme
+    if (origin === "apply://" || origin.startsWith("apply://")) {
+      return true;
+    }
+
     if (
       origin.startsWith("http://localhost:") ||
       origin.startsWith("http://127.0.0.1:")

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct OpportunityDetailView: View {
     let opportunity: Opportunity
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -15,22 +16,24 @@ struct OpportunityDetailView: View {
 
             Divider()
 
-            HStack {
-                Image(systemName: "location.fill")
-                Text(opportunity.location)
+            if let location = opportunity.location {
+                HStack {
+                    Image(systemName: "location.fill")
+                    Text(location)
+                }
             }
 
             Divider()
 
-            Button {
-                if let url = URL(string: opportunity.url) {
-                    UIApplication.shared.open(url)
+            if let urlString = opportunity.url, let url = URL(string: urlString) {
+                Button {
+                    openURL(url)
+                } label: {
+                    Label("Voir l'offre", systemImage: "link")
+                        .frame(maxWidth: .infinity)
                 }
-            } label: {
-                Label("Voir l’offre", systemImage: "link")
-                    .frame(maxWidth: .infinity)
+                .buttonStyle(.borderedProminent)
             }
-            .buttonStyle(.borderedProminent)
 
             Button {
                 // plus tard : marquer comme postulé

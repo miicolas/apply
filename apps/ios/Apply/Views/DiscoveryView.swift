@@ -1,8 +1,7 @@
 import SwiftUI
 
 struct DiscoveryView: View {
-
-    @State private var opportunities = mockOpportunities
+    @EnvironmentObject var opportunitiesVM: OpportunitiesViewModel
 
     var body: some View {
         NavigationStack {
@@ -10,8 +9,10 @@ struct DiscoveryView: View {
                 ZStack {
                     Color(.systemGroupedBackground)
                         .ignoresSafeArea()
-                    
-                    if opportunities.isEmpty {
+
+                    if opportunitiesVM.isLoading {
+                        ProgressView()
+                    } else if opportunitiesVM.newOpportunities.isEmpty {
                         VStack(spacing: 24) {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.system(size: 60))
@@ -19,9 +20,13 @@ struct DiscoveryView: View {
                             Text("Plus d'opportunités")
                                 .font(.title2)
                                 .foregroundColor(.secondary)
-                            
-                            Button(action: resetOpportunities) {
-                                Label("Réinitialiser", systemImage: "arrow.clockwise")
+
+                            Button(action: {
+                                Task {
+                                    await opportunitiesVM.fetchNewOpportunities()
+                                }
+                            }) {
+                                Label("Actualiser", systemImage: "arrow.clockwise")
                                     .font(.headline)
                                     .foregroundColor(.white)
                                     .padding(.horizontal, 24)
@@ -31,7 +36,7 @@ struct DiscoveryView: View {
                             }
                         }
                     } else {
-                        ForEach(Array(opportunities.reversed().enumerated()), id: \.element.id) { index, opp in
+                        ForEach(Array(opportunitiesVM.newOpportunities.reversed().enumerated()), id: \.element.id) { index, opp in
                             OpportunityCard(
                                 opportunity: opp,
                                 onSwipeRight: {
@@ -50,7 +55,7 @@ struct DiscoveryView: View {
                                 y: CGFloat(index) * 8
                             )
                             .scaleEffect(1 - CGFloat(index) * 0.05)
-                            .zIndex(Double(opportunities.count - index))
+                            .zIndex(Double(opportunitiesVM.newOpportunities.count - index))
                             .opacity(index < 3 ? 1 : 0)
                         }
                     }
@@ -62,31 +67,34 @@ struct DiscoveryView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: resetOpportunities) {
+                    Button(action: {
+                        Task {
+                            await opportunitiesVM.fetchNewOpportunities()
+                        }
+                    }) {
                         Image(systemName: "arrow.clockwise")
                     }
                 }
+            }
+            .task {
+                await opportunitiesVM.fetchNewOpportunities()
             }
         }
     }
 
     private func validate(_ opportunity: Opportunity) {
         withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-            opportunities.removeAll { $0.id == opportunity.id }
+            Task {
+                await opportunitiesVM.validateOpportunity(opportunity)
+            }
         }
-        // plus tard : move vers "À postuler"
     }
 
     private func ignore(_ opportunity: Opportunity) {
         withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-            opportunities.removeAll { $0.id == opportunity.id }
-        }
-    }
-    
-    private func resetOpportunities() {
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-            opportunities = mockOpportunities
+            Task {
+                await opportunitiesVM.ignoreOpportunity(opportunity)
+            }
         }
     }
 }
-

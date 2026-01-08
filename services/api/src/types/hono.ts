@@ -1,4 +1,4 @@
-import { auth } from "../../auth.js";
+import { auth } from "../config/auth.js";
 
 export type HonoContext = {
     Variables: {
