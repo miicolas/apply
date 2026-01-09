@@ -6,14 +6,20 @@
     "dev": "tsx watch src/index.ts",
     "dev:api": "tsx watch src/index.ts",
     "dev:db": "drizzle-kit studio",
-    "dev:email": "email dev --port 3001",    "dev:all": "concurrently -n \"API,DB,EMAIL\" -c \"blue,green,yellow\" \"npm run dev:api\" \"npm run dev:db\" \"npm run dev:email\"",
+    "dev:trigger": "npx trigger.dev@latest dev",
+    "dev:email": "email dev --port 3001",
+    "dev:claude": "mgrep watch --store \"apply\"",
+    "dev:all": "concurrently -n \"API,DB,EMAIL,TRIGGER,CLAUDE\" -c \"blue,green,yellow,magenta,cyan\" \"npm run dev:api\" \"npm run dev:db\" \"npm run dev:email\" \"npm run dev:trigger\"",
     "start": "tsx src/index.ts"
+
   },
   "dependencies": {
     "@hono/node-server": "^1.19.7",
     "@neondatabase/serverless": "^1.0.2",
     "@react-email/components": "^1.0.4",
     "@react-email/render": "^2.0.2",
+    "@trigger.dev/sdk": "^4.3.2",
+    "ai": "^6.0.25",
     "better-auth": "^1.4.10",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.45.1",
@@ -21,16 +27,18 @@
     "pg": "^8.16.3",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "resend": "^6.6.0"
+    "resend": "^6.6.0",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
-    "@types/node": "^20.11.17",
+    "@trigger.dev/build": "^4.3.2",
+    "@types/node": "^20.19.27",
     "@types/pg": "^8.16.0",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "concurrently": "^9.2.1",
     "drizzle-kit": "^0.31.8",
     "tsx": "^4.21.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   }
 }
