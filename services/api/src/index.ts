@@ -3,16 +3,13 @@ import { serve } from "@hono/node-server";
 import { authMiddleware, corsMiddleware } from "./middleware/index.js";
 import { authHandler, sessionHandler } from "./routes/index.js";
 import type { HonoContext } from "./types/hono.js";
-import opportunitiesRouter from "./routes/opportunities.js";
 import { logger } from 'hono/logger'
-
 
 const app = new Hono<HonoContext>();
 
 app.use('*', logger())
 
 app.use("*", corsMiddleware);
-
 
 app.use("/api/auth/*", async (c, next) => {
     const origin = c.req.header("origin");
@@ -49,7 +46,10 @@ app.on(["POST", "GET"], "/api/auth/*", authHandler);
 app.get("/session", sessionHandler);
 app.get("/api/auth/session", sessionHandler);
 
-app.route("/api/opportunities", opportunitiesRouter);
+// Routes will be added here:
+// app.route("/api/job-offers", jobOffersRouter);
+// app.route("/api/applications", applicationsRouter);
+// app.route("/api/user-preferences", userPreferencesRouter);
 
 const port = Number(process.env.PORT) || 3000;
 const hostname = process.env.HOSTNAME || "0.0.0.0";
