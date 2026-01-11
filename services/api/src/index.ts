@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
 import { authMiddleware, corsMiddleware } from "./middleware/index.js";
-import { authHandler, sessionHandler } from "./routes/index.js";
+import { authHandler, sessionHandler, jobsRouter, jobOffersRouter } from "./routes/index.js";
 import type { HonoContext } from "./types/hono.js";
 import { logger } from 'hono/logger'
 
@@ -46,8 +46,11 @@ app.on(["POST", "GET"], "/api/auth/*", authHandler);
 app.get("/session", sessionHandler);
 app.get("/api/auth/session", sessionHandler);
 
+// Routes
+app.route("/api/jobs", jobsRouter);
+app.route("/api/job-offers", jobOffersRouter);
+
 // Routes will be added here:
-// app.route("/api/job-offers", jobOffersRouter);
 // app.route("/api/applications", applicationsRouter);
 // app.route("/api/user-preferences", userPreferencesRouter);
 
