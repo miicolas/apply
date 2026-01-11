@@ -70,4 +70,10 @@ struct ScoringEngine {
         case hybrid
         case onsite
     }
+    
+    enum Priority {
+        case A
+        case B
+        case C
+    }
 }

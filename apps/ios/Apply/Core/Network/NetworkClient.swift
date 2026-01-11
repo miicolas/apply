@@ -18,6 +18,10 @@ enum HTTPMethod: String {
     case DELETE
 }
 
+struct ErrorResponse: Decodable {
+    let error: String
+}
+
 struct Endpoint {
     let path: String
     let queryItems: [URLQueryItem]?
@@ -36,7 +40,21 @@ struct APINetworkClient: NetworkClient {
         self.baseURL = baseURL
 
         let jsonDecoder = JSONDecoder()
-        jsonDecoder.dateDecodingStrategy = .iso8601
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        jsonDecoder.dateDecodingStrategy = .custom { decoder in
+            let container = try decoder.singleValueContainer()
+            let dateString = try container.decode(String.self)
+            if let date = formatter.date(from: dateString) {
+                return date
+            }
+            // Fallback without fractional seconds
+            formatter.formatOptions = [.withInternetDateTime]
+            if let date = formatter.date(from: dateString) {
+                return date
+            }
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid date format")
+        }
         self.decoder = jsonDecoder
     }
 
@@ -76,10 +94,10 @@ struct APINetworkClient: NetworkClient {
             case 404:
                 throw APIError.notFound
             case 400:
-                let errorResponse = try? decoder.decode(ErrorResponse.self, from: data)
+                let errorResponse: ErrorResponse? = try? decoder.decode(ErrorResponse.self, from: data)
                 throw APIError.validationError(errorResponse?.error ?? "Invalid data")
             default:
-                let errorResponse = try? decoder.decode(ErrorResponse.self, from: data)
+                let errorResponse: ErrorResponse? = try? decoder.decode(ErrorResponse.self, from: data)
                 throw APIError.serverError(errorResponse?.error ?? "Unknown error")
             }
         } catch let error as APIError {
@@ -89,3 +107,4 @@ struct APINetworkClient: NetworkClient {
         }
     }
 }
+

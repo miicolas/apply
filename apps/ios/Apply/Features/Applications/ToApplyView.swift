@@ -6,84 +6,134 @@
 import SwiftUI
 
 struct ToApplyView: View {
-    // TODO: Replace with ApplicationViewModel when created
-    @State private var applications: [Application] = []
+    @State private var jobOffers: [JobOffer] = []
     @State private var isLoading = false
-    @State private var error: String?
+    @State private var errorMessage: String?
+    @State private var isPresentingAddJobOfferView = false
 
     var body: some View {
         NavigationStack {
             Group {
-                if applications.isEmpty {
+                if isLoading {
+                    ProgressView()
+                } else if jobOffers.isEmpty {
                     ContentUnavailableView(
-                        "Aucune candidature",
+                        "Aucune offre",
                         systemImage: "tray",
-                        description: Text("Ajoutez des offres à postuler")
+                        description: Text("Ajoutez des offres d'emploi")
                     )
                 } else {
                     List {
-                        ForEach(applications) { application in
-                            NavigationLink(value: application) {
-                                ApplicationRowView(application: application)
+                        ForEach(jobOffers) { jobOffer in
+                            NavigationLink(value: jobOffer) {
+                                JobOfferRowView(jobOffer: jobOffer)
                             }
                         }
-                        .onDelete(perform: deleteApplications)
+                        .onDelete(perform: deleteJobOffers)
                     }
-                    .navigationDestination(for: Application.self) { application in
-                        // TODO: Create ApplicationDetailView
-                        Text("Application Detail")
+                    .navigationDestination(for: JobOffer.self) { jobOffer in
+                        JobOfferDetailView(jobOffer: jobOffer)
                     }
                 }
             }
-            .navigationTitle("À postuler")
+            .navigationTitle("Mes offres")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        // TODO: Show AddJobOfferView
+                        isPresentingAddJobOfferView = true
                     }) {
                         Image(systemName: "plus")
                     }
                 }
             }
             .task {
-                await fetchApplications()
+                await fetchJobOffers()
             }
             .refreshable {
-                await fetchApplications()
+                await fetchJobOffers()
+            }
+            .sheet(isPresented: $isPresentingAddJobOfferView) {
+                AddJobOfferView()
             }
         }
     }
 
-    private func fetchApplications() async {
-        isLoading = true
-        error = nil
-        // TODO: Implement API call to fetch applications with status "to_apply"
-        applications = []
-        isLoading = false
+    @MainActor
+    private func fetchJobOffers() async {
+        errorMessage = nil
+        do {
+            jobOffers = try await getAllJobOffers()
+            print("Fetched \(jobOffers.count) job offers")
+        } catch {
+            print("Error fetching job offers: \(error)")
+            errorMessage = error.localizedDescription
+        }
     }
 
-    private func deleteApplications(at offsets: IndexSet) {
+    private func deleteJobOffers(at offsets: IndexSet) {
         for index in offsets {
-            let application = applications[index]
+            let jobOffer = jobOffers[index]
             Task {
-                // TODO: Delete application via API
+                // TODO: Delete job offer via API
             }
         }
     }
 }
 
-struct ApplicationRowView: View {
-    let application: Application
+struct JobOfferRowView: View {
+    let jobOffer: JobOffer
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Job Title") // TODO: Load from jobOffer
+        VStack(alignment: .leading, spacing: 6) {
+            Text(jobOffer.title)
                 .font(.headline)
-            Text("Company Name") // TODO: Load from jobOffer.companyId
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+
+            HStack(spacing: 8) {
+                if let contractType = jobOffer.contractType {
+                    Text(contractType.displayName)
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(contractTypeColor(contractType).opacity(0.15))
+                        .foregroundColor(contractTypeColor(contractType))
+                        .cornerRadius(6)
+                }
+
+                if let location = jobOffer.location {
+                    Label(location, systemImage: "location")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            if let skills = jobOffer.requiredSkills, !skills.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 4) {
+                        ForEach(skills.prefix(5), id: \.self) { skill in
+                            Text(skill)
+                                .font(.caption2)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color.gray.opacity(0.1))
+                                .cornerRadius(4)
+                        }
+                    }
+                }
+            }
         }
         .padding(.vertical, 4)
+    }
+
+    private func contractTypeColor(_ type: ContractType) -> Color {
+        switch type {
+        case .cdi: return .green
+        case .cdd: return .orange
+        case .alternance: return .blue
+        case .stage: return .purple
+        case .freelance: return .pink
+        case .interim: return .yellow
+        }
     }
 }

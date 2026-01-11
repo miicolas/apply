@@ -81,3 +81,18 @@ struct FollowUpView: View {
         isLoading = false
     }
 }
+
+struct ApplicationRowView: View {
+    let application: Application
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(application.jobOfferId) // TODO: Load job offer title
+                .font(.headline)
+            Text(application.status.rawValue)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+        }
+        .padding(.vertical, 4)
+    }
+}
