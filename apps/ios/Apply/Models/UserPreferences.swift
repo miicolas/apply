@@ -13,8 +13,8 @@ struct UserPreferences: Identifiable, Codable, Hashable {
     let education: String?
     let preferredContract: String?
     let preferredLocation: String?
-    let createdAt: Date?
-    let updatedAt: Date?
+    let createdAt: String?
+    let updatedAt: String?
 }
 
 enum LocationType: String, Codable, CaseIterable {

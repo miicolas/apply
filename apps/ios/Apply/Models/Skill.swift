@@ -12,8 +12,8 @@ struct Skill: Identifiable, Codable, Hashable {
     let userId: String
     let name: String
     let level: String?
-    let createdAt: Date?
-    let updatedAt: Date?
+    let createdAt: String?
+    let updatedAt: String?
 }
 
 enum SkillLevel: String, Codable, CaseIterable {

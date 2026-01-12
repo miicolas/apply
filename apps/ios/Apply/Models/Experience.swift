@@ -15,8 +15,8 @@ struct Experience: Identifiable, Codable, Hashable {
     let description: String?
     let startDate: String?
     let endDate: String?
-    let createdAt: Date?
-    let updatedAt: Date?
+    let createdAt: String?
+    let updatedAt: String?
 
     // Helper to get startDate as Date
     var startDateAsDate: Date? {
