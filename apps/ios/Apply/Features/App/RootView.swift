@@ -22,6 +22,11 @@ struct RootView: View {
                 .tabItem {
                     Label("Suivi", systemImage: "clock")
                 }
+
+            ProfileView()
+                .tabItem {
+                    Label("Profil", systemImage: "person.circle")
+                }
         }
     }
 }

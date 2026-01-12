@@ -1,7 +1,15 @@
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
 import { authMiddleware, corsMiddleware } from "./middleware/index.js";
-import { authHandler, sessionHandler, jobsRouter, jobOffersRouter } from "./routes/index.js";
+import {
+  authHandler,
+  sessionHandler,
+  jobsRouter,
+  jobOffersRouter,
+  userSkillsRouter,
+  userExperiencesRouter,
+  userPreferencesRouter
+} from "./routes/index.js";
 import type { HonoContext } from "./types/hono.js";
 import { logger } from 'hono/logger'
 
@@ -49,10 +57,12 @@ app.get("/api/auth/session", sessionHandler);
 // Routes
 app.route("/api/jobs", jobsRouter);
 app.route("/api/job-offers", jobOffersRouter);
+app.route("/api/user-skills", userSkillsRouter);
+app.route("/api/user-experiences", userExperiencesRouter);
+app.route("/api/user-preferences", userPreferencesRouter);
 
 // Routes will be added here:
 // app.route("/api/applications", applicationsRouter);
-// app.route("/api/user-preferences", userPreferencesRouter);
 
 const port = Number(process.env.PORT) || 3000;
 const hostname = process.env.HOSTNAME || "0.0.0.0";

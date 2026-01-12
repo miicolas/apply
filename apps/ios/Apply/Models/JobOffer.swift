@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ContractType: String, Codable {
+enum ContractType: String, Codable, CaseIterable {
     case cdi
     case cdd
     case alternance

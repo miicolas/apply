@@ -13,20 +13,26 @@ struct Experience: Identifiable, Codable, Hashable {
     let title: String
     let company: String?
     let description: String?
-    let startDate: Date?
-    let endDate: Date?
+    let startDate: String?
+    let endDate: String?
     let createdAt: Date?
     let updatedAt: Date?
-    
-    enum CodingKeys: String, CodingKey {
-        case id
-        case userId = "user_id"
-        case title
-        case company
-        case description
-        case startDate = "start_date"
-        case endDate = "end_date"
-        case createdAt = "created_at"
-        case updatedAt = "updated_at"
+
+    // Helper to get startDate as Date
+    var startDateAsDate: Date? {
+        guard let startDate = startDate else { return nil }
+        return Self.dateFormatter.date(from: startDate)
     }
+
+    // Helper to get endDate as Date
+    var endDateAsDate: Date? {
+        guard let endDate = endDate else { return nil }
+        return Self.dateFormatter.date(from: endDate)
+    }
+
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }()
 }

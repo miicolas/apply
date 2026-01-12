@@ -26,7 +26,7 @@ export const jobOffer = pgTable(
       .references(() => company.id, { onDelete: "cascade" }),
     category: varchar("category", { length: 100 }), // e.g., "dev", "marketing", "data"
     description: text("description"),
-    requiredSkills: text("required_skills").array(), // Array of short labels
+    requiredSkills: text("required_skills").array(),
     contractType: contractTypeEnum("contract_type"),
     location: varchar("location", { length: 255 }),
     salaryMin: integer("salary_min"),           // €/mois
@@ -41,7 +41,6 @@ export const jobOffer = pgTable(
     createdByUserId: text("created_by_user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    publicAt: timestamp("public_at"), // When the offer becomes public (48h after creation)
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -53,7 +52,6 @@ export const jobOffer = pgTable(
     index("job_offer_createdByUserId_idx").on(table.createdByUserId),
     index("job_offer_isPublic_idx").on(table.isPublic),
     index("job_offer_isActive_idx").on(table.isActive),
-    index("job_offer_publicAt_idx").on(table.publicAt),
     index("job_offer_sourceUrl_idx").on(table.sourceUrl),
   ]
 );

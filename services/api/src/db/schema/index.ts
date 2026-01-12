@@ -6,3 +6,4 @@ export * from "./user_experience/index";
 export * from "./job_offer/index";
 export * from "./application/index";
 export * from "./job/index";
+export * from "./skills/index";

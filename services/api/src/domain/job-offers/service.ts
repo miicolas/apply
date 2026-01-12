@@ -1,6 +1,6 @@
 import { db } from "../../db/index.js";
-import { jobOffer, type NewJobOffer } from "../../db/schema/job_offer/index.js";
-import { eq, and, desc, gte, sql } from "drizzle-orm";
+import { jobOffer } from "../../db/schema/job_offer/index.js";
+import { eq, and, desc, gte } from "drizzle-orm";
 import type { CreateJobOfferInput, UpdateJobOfferInput } from "./schema.js";
 
 export class JobOfferService {
@@ -20,7 +20,6 @@ export class JobOfferService {
     }
 
     if (filters?.recentOnly) {
-      // Only offers created in the last 15 days
       const fifteenDaysAgo = new Date();
       fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15);
       conditions.push(gte(jobOffer.createdAt, fifteenDaysAgo));
@@ -53,19 +52,15 @@ export class JobOfferService {
     return result || null;
   }
 
-  async create(userId: string, data: CreateJobOfferInput) {
-    // Set publicAt to 48 hours from now
-    const publicAt = new Date();
-    publicAt.setHours(publicAt.getHours() + 48);
+  async create(userId: string, data: CreateJobOfferInput) { 
 
     const [newJobOffer] = await db
       .insert(jobOffer)
       .values({
         ...data,
         createdByUserId: userId,
-        isPublic: false, // Private for 48h
+        isPublic: false,
         isActive: true,
-        publicAt,
       })
       .returning();
 
@@ -99,7 +94,6 @@ export class JobOfferService {
       .update(jobOffer)
       .set({
         isPublic: true,
-        publicAt: new Date(),
         updatedAt: new Date(),
       })
       .where(eq(jobOffer.id, id))

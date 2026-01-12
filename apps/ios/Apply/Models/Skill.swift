@@ -14,19 +14,18 @@ struct Skill: Identifiable, Codable, Hashable {
     let level: String?
     let createdAt: Date?
     let updatedAt: Date?
-    
-    enum CodingKeys: String, CodingKey {
-        case id
-        case userId = "user_id"
-        case name
-        case level
-        case createdAt = "created_at"
-        case updatedAt = "updated_at"
-    }
 }
 
-enum SkillLevel: String, Codable {
+enum SkillLevel: String, Codable, CaseIterable {
     case beginner = "beginner"
     case intermediate = "intermediate"
     case advanced = "advanced"
+
+    var displayName: String {
+        switch self {
+        case .beginner: return "Débutant"
+        case .intermediate: return "Intermédiaire"
+        case .advanced: return "Avancé"
+        }
+    }
 }
